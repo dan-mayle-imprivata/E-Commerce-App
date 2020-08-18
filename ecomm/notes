@@ -1,0 +1,3 @@
+Install a few dependancies to help with our project:
+    "nodemon": "^2.0.4" Allows you to see changes on server without needing to restart.
+    "express": "^4.17.1", Able to start web server quickly.
