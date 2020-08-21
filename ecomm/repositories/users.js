@@ -1,6 +1,7 @@
 const fs = require("fs");
 const crypto = require("crypto");
 const { O_RDONLY } = require("constants");
+const { report } = require("process");
 
 class UsersRepository {
   constructor(filename) {
@@ -47,14 +48,19 @@ class UsersRepository {
     const records = await this.getAll();
     return records.find((record) => record.id === id);
   }
+
+  async delete(id) {
+    const records = await this.getAll();
+    const filteredRecords = records.filter((record) => record.id !== id);
+    await this.writeAll(filteredRecords);
+  }
 }
 
 // Error Test
 const test = async () => {
   const repo = new UsersRepository("users.json");
 
-  const user = await repo.getOne("2667adc6");
-  console.log(user);
+  await repo.delete("2667adc6");
 };
 
 test();
