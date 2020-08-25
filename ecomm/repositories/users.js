@@ -85,7 +85,10 @@ class UsersRepository {
   }
 }
 
-// Error Test
+module.exports = new UsersRepository("users.json");
+
+/* Error Test function used for  CRUD methods
+
 const test = async () => {
   const repo = new UsersRepository("users.json");
 
@@ -98,3 +101,5 @@ const test = async () => {
 };
 
 test();
+
+*/
