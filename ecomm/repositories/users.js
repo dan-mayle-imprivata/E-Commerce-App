@@ -1,13 +1,12 @@
 const fs = require("fs");
 const crypto = require("crypto");
-const { O_RDONLY } = require("constants");
-const { report } = require("process");
 
 class UsersRepository {
   constructor(filename) {
     if (!filename) {
       throw new Error("Creating a repository requires a filename");
     }
+
     this.filename = filename;
     try {
       fs.accessSync(this.filename);
@@ -25,7 +24,7 @@ class UsersRepository {
   }
 
   async create(attrs) {
-    attrs.id = this.randomID();
+    attrs.id = this.randomId();
 
     const records = await this.getAll();
     records.push(attrs);
@@ -42,7 +41,7 @@ class UsersRepository {
     );
   }
 
-  randomID() {
+  randomId() {
     return crypto.randomBytes(4).toString("hex");
   }
 
@@ -62,7 +61,7 @@ class UsersRepository {
     const record = records.find((record) => record.id === id);
 
     if (!record) {
-      throw new Error(`Record with id of ${id} not found`);
+      throw new Error(`Record with id ${id} not found`);
     }
 
     Object.assign(record, attrs);
@@ -71,6 +70,7 @@ class UsersRepository {
 
   async getOneBy(filters) {
     const records = await this.getAll();
+
     for (let record of records) {
       let found = true;
 
@@ -80,7 +80,7 @@ class UsersRepository {
         }
       }
 
-      if (found == true) {
+      if (found) {
         return record;
       }
     }
