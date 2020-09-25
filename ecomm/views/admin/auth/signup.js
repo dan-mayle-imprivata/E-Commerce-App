@@ -1,5 +1,10 @@
 module.exports = ({ req }) => {
   return `
+  <!DOCTYPE html>
+  <html>
+    <head>
+    </head>
+    <body>
       <div>
         Your id is: ${req.session.userId}
         <form method="POST">
@@ -9,5 +14,7 @@ module.exports = ({ req }) => {
           <button>Sign Up</button>
         </form>
       </div>
+    </body>
+  </html>
     `;
 };
