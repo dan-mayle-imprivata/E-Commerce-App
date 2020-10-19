@@ -1,49 +1,58 @@
 const fs = require("fs");
+const crypto = require("crypto");
+const util = require("util");
+const Repository = require("./repository");
 
-class UsersRepository {
-  constructor(filename) {
-    if (!filename) {
-      throw new Error("Creating a repository requires a filename");
-    }
-    this.filename = filename;
-    try {
-      fs.accessSync(this.filename);
-    } catch (err) {
-      fs.writeFileSync(this.filename, "[]");
-    }
-  }
+// Testing Git
 
-  async getAll() {
-    return JSON.parse(
-      await fs.promises.readFile(this.filename, {
-        encoding: "utf8",
-      })
-    );
+const scrypt = util.promisify(crypto.scrypt);
+
+class UsersRepository extends Repository {
+  async comparePasswords(saved, supplied) {
+    // Saved -> password saved in database. 'hashed.salt'
+    // Supplied -> password given to us by user trying to sign in
+
+    const [hashed, salt] = saved.split(".");
+    const hashedSuppliedBuf = await scrypt(supplied, salt, 64);
+
+    return hashed === hashedSuppliedBuf.toString("hex");
   }
 
   async create(attrs) {
+    attrs.id = this.randomId();
+
+    const salt = crypto.randomBytes(8).toString("hex");
+    const buf = await scrypt(attrs.password, salt, 64);
+
     const records = await this.getAll();
-    records.push(attrs);
+    const record = {
+      ...attrs,
+      password: `${buf.toString("hex")}.${salt}`,
+    };
+
+    records.push(record);
 
     await this.writeAll(records);
-  }
 
-  async writeAll(records) {
-    await fs.promises.writeFile(
-      this.filename,
-      JSON.stringify(records, null, 2)
-    );
+    return record;
   }
 }
 
-// Error Test
+module.exports = new UsersRepository("users.json");
+
+/* Error Test function used for  CRUD methods
+
 const test = async () => {
   const repo = new UsersRepository("users.json");
 
-  await repo.create({ email: "test@test.com", password: "password" });
+  const user = await repo.getOneBy({
+    email: "test@test.com",
+    password: "mypassword",
+  });
 
-  const users = await repo.getAll();
-  console.log(users);
+  console.log(user);
 };
 
 test();
+
+*/
