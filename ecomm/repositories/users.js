@@ -39,20 +39,3 @@ class UsersRepository extends Repository {
 }
 
 module.exports = new UsersRepository("users.json");
-
-/* Error Test function used for  CRUD methods
-
-const test = async () => {
-  const repo = new UsersRepository("users.json");
-
-  const user = await repo.getOneBy({
-    email: "test@test.com",
-    password: "mypassword",
-  });
-
-  console.log(user);
-};
-
-test();
-
-*/
